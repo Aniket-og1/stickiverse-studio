@@ -1,0 +1,23 @@
+# STICKIVERSE STUDIO Robots.txt
+# Technical SEO configuration
+
+User-agent: *
+Allow: /
+Allow: /#/?*
+Allow: /#/shop?*
+Allow: /#/product/*
+Allow: /#/blog/*
+
+# Disallow indexing of private cart states and secure merchant portal
+Disallow: /admin.html
+Disallow: /admin.js
+Disallow: /admin.css
+Disallow: /#/checkout
+Disallow: /#/dashboard
+Disallow: /#/wishlist
+Disallow: /#/cart
+Disallow: /#/order-success/*
+
+# Host details
+Sitemap: https://stickiversestudio.com/sitemap.xml
+Host: https://stickiversestudio.com

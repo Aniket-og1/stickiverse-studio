@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>STICKIVERSE STUDIO | Premium Holographic & Cyber Stickers</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Welcome to STICKIVERSE STUDIO. Explore our premium, futuristic, and custom holographic & neon cyberpunk sticker packs. Free shipping inside India and secure UPI/FamPay checkouts.">
+  <meta name="keywords" content="stickers, holographic stickers, cyberpunk merchandise, custom decals, stickiverse, fampay stickers, neon art">
+  <meta name="author" content="STICKIVERSE STUDIO">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://stickiversestudio.com/">
+  <meta property="og:title" content="STICKIVERSE STUDIO | Premium Holographic & Cyber Stickers">
+  <meta property="og:description" content="Discover premium, high-quality, dripping neon & custom stickers. Mobile-friendly ecommerce with FamPay / UPI payment support.">
+  <meta property="og:image" content="assets/hero_banner.png">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://stickiversestudio.com/">
+  <meta property="twitter:title" content="STICKIVERSE STUDIO | Premium Holographic & Cyber Stickers">
+  <meta property="twitter:description" content="Discover premium, high-quality, dripping neon & custom stickers. Mobile-friendly ecommerce with FamPay / UPI payment support.">
+  <meta property="twitter:image" content="assets/hero_banner.png">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Core Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Schema Markup (JSON-LD) for Local Business/Store -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Store",
+    "name": "STICKIVERSE STUDIO",
+    "image": "assets/hero_banner.png",
+    "@id": "https://stickiversestudio.com/#store",
+    "url": "https://stickiversestudio.com/",
+    "telephone": "+919876543210",
+    "priceRange": "$$",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Creative Zone, Sector 4",
+      "addressLocality": "Bangalore",
+      "addressRegion": "Karnataka",
+      "postalCode": "560001",
+      "addressCountry": "IN"
+    },
+    "openingHoursSpecification": {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ],
+      "opens": "00:00",
+      "closes": "23:59"
+    },
+    "sameAs": [
+      "https://instagram.com/stickiverse_studio"
+    ]
+  }
+  </script>
+</head>
+<body class="dark-theme">
+  <!-- Dynamic Loader -->
+  <div id="page-loader" class="loader-container">
+    <div class="loader">
+      <div class="loader-ring"></div>
+      <div class="loader-text">STICKIVERSE</div>
+    </div>
+  </div>
+
+  <!-- Main Grid Layout -->
+  <div class="app-container">
+    
+    <!-- Sticky Navigation Header -->
+    <header class="glass-header">
+      <div class="header-inner">
+        <!-- Logo and Brand -->
+        <a href="#/" class="logo-link" id="nav-logo">
+          <div class="logo-wrapper">
+            <span class="logo-text">STICKI<span class="highlight">VERSE</span></span>
+            <div class="logo-drips">
+              <span class="drip drip-1"></span>
+              <span class="drip drip-2"></span>
+              <span class="drip drip-3"></span>
+            </div>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation -->
+        <nav class="desktop-nav">
+          <ul>
+            <li><a href="#/" class="nav-item active" id="nav-home">Home</a></li>
+            <li><a href="#/shop" class="nav-item" id="nav-shop">Shop</a></li>
+            <li><a href="#/blog" class="nav-item" id="nav-blog">Blog</a></li>
+            <li><a href="#/faq" class="nav-item" id="nav-faq">FAQs</a></li>
+            <li><a href="#/about" class="nav-item" id="nav-about">About</a></li>
+            <li><a href="#/contact" class="nav-item" id="nav-contact">Contact</a></li>
+          </ul>
+        </nav>
+
+        <!-- Header Actions -->
+        <div class="header-actions">
+          <!-- Search Bar Trigger -->
+          <div class="search-trigger-container">
+            <button class="action-btn" id="search-trigger" aria-label="Search products">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+            <div class="dropdown-search-box" id="dropdown-search">
+              <input type="text" id="search-input" placeholder="Search stickers...">
+              <button id="search-btn"><i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+          </div>
+
+          <!-- Theme Toggle -->
+          <button class="action-btn" id="theme-toggle" aria-label="Toggle theme">
+            <i class="fa-solid fa-moon moon-icon"></i>
+            <i class="fa-solid fa-sun sun-icon"></i>
+          </button>
+
+          <!-- Wishlist Trigger -->
+          <a href="#/wishlist" class="action-btn position-relative" id="wishlist-trigger" aria-label="Wishlist">
+            <i class="fa-regular fa-heart"></i>
+            <span class="badge" id="wishlist-badge">0</span>
+          </a>
+
+          <!-- Cart Trigger -->
+          <button class="action-btn position-relative" id="cart-trigger" aria-label="Shopping Cart">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span class="badge badge-accent" id="cart-badge">0</span>
+          </button>
+
+          <!-- User Trigger (Login / Dashboard) -->
+          <a href="#/dashboard" class="action-btn" id="user-trigger" aria-label="User Account">
+            <i class="fa-regular fa-user"></i>
+          </a>
+
+          <!-- Mobile Menu Trigger -->
+          <button class="action-btn mobile-menu-btn" id="mobile-menu-trigger" aria-label="Toggle menu">
+            <i class="fa-solid fa-bars-staggered"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Mobile Navigation Drawer -->
+    <div class="mobile-drawer" id="mobile-drawer">
+      <div class="drawer-header">
+        <span class="logo-text">STICKI<span class="highlight">VERSE</span></span>
+        <button class="close-drawer" id="close-mobile-drawer"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="drawer-body">
+        <ul class="mobile-nav-links">
+          <li><a href="#/" class="mobile-nav-item active">Home</a></li>
+          <li><a href="#/shop" class="mobile-nav-item">Shop</a></li>
+          <li><a href="#/blog" class="mobile-nav-item">Blog</a></li>
+          <li><a href="#/faq" class="mobile-nav-item">FAQs</a></li>
+          <li><a href="#/about" class="mobile-nav-item">About Us</a></li>
+          <li><a href="#/contact" class="mobile-nav-item">Contact</a></li>
+          <li><a href="#/dashboard" class="mobile-nav-item">My Account</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="drawer-overlay" id="mobile-drawer-overlay"></div>
+
+    <!-- Sliding Shopping Cart Drawer (Right Side) -->
+    <div class="cart-drawer" id="cart-drawer">
+      <div class="drawer-header">
+        <h3>Shopping Cart (<span id="cart-drawer-count">0</span>)</h3>
+        <button class="close-drawer" id="close-cart-drawer"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="drawer-body" id="cart-drawer-items">
+        <!-- Cart Items list will render dynamically -->
+        <div class="empty-cart">
+          <i class="fa-solid fa-cart-shopping"></i>
+          <p>Your cart is empty</p>
+          <a href="#/shop" class="btn btn-primary btn-sm">Explore Shop</a>
+        </div>
+      </div>
+      <div class="drawer-footer" id="cart-drawer-footer">
+        <!-- Shipping notice with progress bar -->
+        <div id="cart-drawer-shipping-notice" class="shipping-notice-box" style="display: none;">
+          <span id="shipping-notice-text">Add ₹0.00 more for FREE shipping!</span>
+          <div class="shipping-progress-bg">
+            <div id="shipping-progress-bar" class="shipping-progress-bar"></div>
+          </div>
+        </div>
+        <div class="cart-summary-row">
+          <span>Subtotal:</span>
+          <span class="cart-total" id="cart-drawer-total">₹0.00</span>
+        </div>
+        <div class="cart-summary-row shipping-row">
+          <span>Shipping:</span>
+          <span class="text-success font-bold" id="cart-drawer-shipping">FREE</span>
+        </div>
+        <div class="cart-actions">
+          <a href="#/cart" class="btn btn-secondary w-100">View Cart</a>
+          <a href="#/checkout" class="btn btn-primary w-100">Checkout Now</a>
+        </div>
+      </div>
+    </div>
+    <div class="drawer-overlay" id="cart-drawer-overlay"></div>
+
+    <!-- Main View Container (Dynamic Content Injection) -->
+    <main id="main-content" class="main-content">
+      <!-- Injected by Router -->
+    </main>
+
+    <!-- Newsletter & Trust Banner -->
+    <section class="newsletter-section">
+      <div class="container">
+        <div class="newsletter-grid">
+          <div class="newsletter-info">
+            <h2>Join the Sticker Rebellion</h2>
+            <p>Subscribe to get exclusive early drops, holographic sticker giveaways, and 15% off your first order.</p>
+          </div>
+          <form class="newsletter-form" id="newsletter-form">
+            <input type="email" placeholder="Enter your email address" required id="newsletter-email">
+            <button type="submit" class="btn btn-accent">Subscribe</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+      <div class="footer-top">
+        <div class="footer-grid">
+          <!-- Column 1: Brand Info -->
+          <div class="footer-col brand-col">
+            <span class="logo-text font-large">STICKI<span class="highlight">VERSE</span></span>
+            <p class="brand-desc">Creating premium, futuristic, and custom holographic merchandise for creators, developers, and dreamers.</p>
+            <div class="social-icons">
+              <a href="https://instagram.com/stickiverse_studio" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-instagram"></i> @stickiverse_studio</a>
+            </div>
+          </div>
+          
+          <!-- Column 2: Quick Links -->
+          <div class="footer-col">
+            <h3>Explore</h3>
+            <ul>
+              <li><a href="#/">Home</a></li>
+              <li><a href="#/shop">Shop Stickers</a></li>
+              <li><a href="#/blog">Studio Blog</a></li>
+              <li><a href="#/faq">Help & FAQ</a></li>
+              <li><a href="#/about">Our Story</a></li>
+            </ul>
+          </div>
+          
+          <!-- Column 3: Customer Care -->
+          <div class="footer-col">
+            <h3>Customer Care</h3>
+            <ul>
+              <li><a href="#/contact">Contact Support</a></li>
+              <li><a href="#/shipping">Shipping Information</a></li>
+              <li><a href="#/refund">Returns & Refunds</a></li>
+              <li><a href="#/terms">Terms of Service</a></li>
+              <li><a href="#/privacy">Privacy Policy</a></li>
+            </ul>
+          </div>
+
+          <!-- Column 4: Trust & Badges -->
+          <div class="footer-col trust-col">
+            <h3>Secured Checkout</h3>
+            <p class="small-text text-secondary mb-3">100% online secure transactions. Payments powered by UPI & FamPay networks.</p>
+            <div class="trust-badges">
+              <span class="badge-item"><i class="fa-solid fa-shield-halved"></i> SSL Secured</span>
+              <span class="badge-item"><i class="fa-solid fa-bolt"></i> Instant UPI Pay</span>
+              <span class="badge-item"><i class="fa-solid fa-truck-fast"></i> India-wide Shipping</span>
+            </div>
+            <div class="payment-methods">
+              <i class="fa-brands fa-cc-visa" title="Visa"></i>
+              <i class="fa-brands fa-cc-mastercard" title="Mastercard"></i>
+              <span class="upi-logo" title="UPI payments">UPI</span>
+              <span class="fampay-badge" title="FamPay linked">FamPay</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div class="footer-bottom-inner">
+          <p class="copyright">&copy; 2026 STICKIVERSE STUDIO. All rights reserved.</p>
+          <div class="footer-meta-links">
+            <a href="admin/" id="storefront-admin-link" target="_blank" class="admin-link"><i class="fa-solid fa-user-gear"></i> Merchant Portal</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Notification Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Login/Signup Auth Modal -->
+  <div class="modal-overlay" id="auth-modal">
+    <div class="modal-content glass-card">
+      <button class="close-modal" id="close-auth-modal"><i class="fa-solid fa-xmark"></i></button>
+      <div class="auth-tabs">
+        <button class="auth-tab-btn active" id="tab-login-btn">Login</button>
+        <button class="auth-tab-btn" id="tab-register-btn">Sign Up</button>
+      </div>
+      
+      <!-- Login Form -->
+      <form id="login-form" class="auth-form active">
+        <div class="form-group">
+          <label for="login-email">Email Address</label>
+          <input type="email" id="login-email" required placeholder="name@example.com">
+        </div>
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn btn-primary w-100 mt-3">Access Account</button>
+      </form>
+
+      <!-- Register Form -->
+      <form id="register-form" class="auth-form">
+        <div class="form-group">
+          <label for="register-name">Full Name</label>
+          <input type="text" id="register-name" required placeholder="John Doe">
+        </div>
+        <div class="form-group">
+          <label for="register-email">Email Address</label>
+          <input type="email" id="register-email" required placeholder="name@example.com">
+        </div>
+        <div class="form-group">
+          <label for="register-password">Password</label>
+          <input type="password" id="register-password" required placeholder="Create password (min 6 chars)">
+        </div>
+        <button type="submit" class="btn btn-primary w-100 mt-3">Create Free Account</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Core App Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
