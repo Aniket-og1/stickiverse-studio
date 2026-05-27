@@ -1817,6 +1817,19 @@ function renderOrderSuccessPage(container, orderId) {
     return;
   }
 
+  // Format WhatsApp message redirect
+  const merchantPhone = settings.phone || "9181251519";
+  let cleanPhone = merchantPhone.replace(/\D/g, "");
+  if (cleanPhone.length === 10) {
+    cleanPhone = "91" + cleanPhone;
+  } else if (!cleanPhone.startsWith("91") && cleanPhone.length === 12) {
+    // If it's 12 digits but not starting with 91, let's keep it as is, or if it has some other prefix
+  }
+  
+  const itemsText = order.items.map(item => `- ${item.title} (Variant: ${item.variant}) x${item.qty}`).join("\n");
+  const waMessage = `Hello STICKIVERSE STUDIO! 🚀\n\nI just placed an order on your website. Here are my details:\n\n*Order ID:* ${order.id}\n*Date:* ${order.date}\n*Total Paid:* ₹${order.total.toFixed(2)} (${order.paymentMethod})\n\n*Ordered Items:*\n${itemsText}\n\n*Shipping Address:*\n${order.shippingDetails.name}\n${order.shippingDetails.address}, ${order.shippingDetails.city} - ${order.shippingDetails.zip}\nPhone: ${order.shippingDetails.phone}`;
+  const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMessage)}`;
+
   container.innerHTML = `
     <div class="container">
       <div class="status-box">
@@ -1838,6 +1851,15 @@ function renderOrderSuccessPage(container, orderId) {
             <strong>Delivery Ship Address:</strong>
             <p class="text-secondary text-sm mt-1">${order.shippingDetails.name}<br>${order.shippingDetails.address}, ${order.shippingDetails.city} - ${order.shippingDetails.zip}</p>
           </div>
+        </div>
+
+        <!-- WhatsApp Confirmation Card -->
+        <div class="glass-card p-4 mt-4 text-center" style="border: 1px dashed var(--accent-pink); background: rgba(236,72,153,0.03); max-width: 500px; margin: 25px auto;">
+          <h3 class="text-accent mb-2" style="display:flex; align-items:center; justify-content:center; gap:8px;"><i class="fa-brands fa-whatsapp text-success"></i> Confirm on WhatsApp</h3>
+          <p class="text-secondary small-text mb-3">Please send your order summary to STICKIVERSE STUDIO via WhatsApp to verify payment and secure prompt courier dispatch.</p>
+          <a href="${waUrl}" target="_blank" class="btn btn-md w-100" style="background-color:#25D366; border-color:#25d366; color:#fff; display:inline-flex; align-items:center; justify-content:center; gap:8px; font-weight:700; border-radius:4px; padding:12px;">
+            <i class="fa-brands fa-whatsapp" style="font-size:1.3rem;"></i> Share Address on WhatsApp
+          </a>
         </div>
 
         <div class="d-flex gap-2" style="justify-content:center;">
