@@ -134,8 +134,12 @@ if (settings.upiId === "stickiverse@fam") {
 if (settings.shippingFee === undefined) {
   settings.shippingFee = 40;
   settings.freeShippingMin = 499;
-  DB.set("sv_settings", settings);
 }
+if (!settings.storefrontUrl) {
+  settings.storefrontUrl = "https://aniket-og1.github.io/stickiverse-studio/";
+  settings.adminUrl = "https://aniket-og1.github.io/stickiverse-admin/";
+}
+DB.set("sv_settings", settings);
 let cart = DB.get("sv_cart", []);
 let wishlist = DB.get("sv_wishlist", []);
 let orders = DB.get("sv_orders", []);
