@@ -102,8 +102,7 @@ const DEFAULT_SETTINGS = {
   address: "Creative Zone, Sector 4, Bangalore, Karnataka, 560001",
   seoTitle: "STICKIVERSE STUDIO | Premium Custom Holographic Stickers",
   seoDescription: "Shop high-quality, dripping cyberpunk, anime, and space stickers. Secure UPI payments to FamPay.",
-  shippingFee: 40,
-  freeShippingMin: 499
+  shippingFee: 40
 };
 
 // Initialize Database State
@@ -126,6 +125,22 @@ let blogs = DB.get("sv_blogs", DEFAULT_BLOGS);
 let coupons = DB.get("sv_coupons", DEFAULT_COUPONS);
 let settings = DB.get("sv_settings", DEFAULT_SETTINGS);
 
+// Database Migrations to clean up relative pathing from older deployments
+let productsMigrated = false;
+products.forEach(p => {
+  if (p.image && p.image.startsWith("../assets/")) {
+    p.image = p.image.replace("../assets/", "assets/");
+    productsMigrated = true;
+  }
+});
+if (productsMigrated) {
+  DB.set("sv_products", products);
+}
+
+if (settings.bannerImage && settings.bannerImage.startsWith("../assets/")) {
+  settings.bannerImage = settings.bannerImage.replace("../assets/", "assets/");
+}
+
 // Database Migration check for User's active FamPay ID
 if (settings.upiId === "stickiverse@fam") {
   settings.upiId = "9181251519@fam";
@@ -133,7 +148,6 @@ if (settings.upiId === "stickiverse@fam") {
 }
 if (settings.shippingFee === undefined) {
   settings.shippingFee = 40;
-  settings.freeShippingMin = 499;
 }
 if (!settings.storefrontUrl) {
   settings.storefrontUrl = "https://aniket-og1.github.io/stickiverse-studio/";
@@ -332,35 +346,16 @@ function renderCartDrawer() {
 
   // Dynamic Shipping calculations
   const shippingFee = settings.shippingFee !== undefined ? settings.shippingFee : 40;
-  const freeShippingMin = settings.freeShippingMin !== undefined ? settings.freeShippingMin : 499;
-  const isFreeShipping = subtotal >= freeShippingMin;
 
   const shippingValEl = document.getElementById("cart-drawer-shipping");
-  const shippingNoticeEl = document.getElementById("cart-drawer-shipping-notice");
-  const noticeTextEl = document.getElementById("shipping-notice-text");
-  const progressBarEl = document.getElementById("shipping-progress-bar");
-
   if (shippingValEl) {
-    if (isFreeShipping) {
-      shippingValEl.className = "text-success font-bold";
-      shippingValEl.innerText = "FREE";
-    } else {
-      shippingValEl.className = "text-secondary font-bold";
-      shippingValEl.innerText = `₹${shippingFee.toFixed(2)}`;
-    }
+    shippingValEl.className = "text-secondary font-bold";
+    shippingValEl.innerText = `₹${shippingFee.toFixed(2)}`;
   }
 
+  const shippingNoticeEl = document.getElementById("cart-drawer-shipping-notice");
   if (shippingNoticeEl) {
-    if (isFreeShipping) {
-      shippingNoticeEl.style.display = "none";
-    } else {
-      shippingNoticeEl.style.display = "flex";
-      const remaining = freeShippingMin - subtotal;
-      noticeTextEl.innerHTML = `Add <span class="highlight">₹${remaining.toFixed(2)}</span> more for <span class="font-bold text-success">FREE shipping</span>!`;
-      
-      const percentage = Math.min(100, (subtotal / freeShippingMin) * 100);
-      progressBarEl.style.width = `${percentage}%`;
-    }
+    shippingNoticeEl.style.display = "none";
   }
   
   // Bind actions
@@ -1425,22 +1420,14 @@ function renderCartPage(container) {
 
     // Dynamic Shipping Calculations
     const shippingFee = settings.shippingFee !== undefined ? settings.shippingFee : 40;
-    const freeShippingMin = settings.freeShippingMin !== undefined ? settings.freeShippingMin : 499;
-    const isFreeShipping = subtotal >= freeShippingMin;
-    const currentShipping = isFreeShipping ? 0 : shippingFee;
 
     const shippingFeeEl = document.getElementById("cart-shipping-fee");
     if (shippingFeeEl) {
-      if (isFreeShipping) {
-        shippingFeeEl.className = "text-success font-bold";
-        shippingFeeEl.innerText = "FREE Delivery";
-      } else {
-        shippingFeeEl.className = "text-secondary font-bold";
-        shippingFeeEl.innerText = `₹${shippingFee.toFixed(2)}`;
-      }
+      shippingFeeEl.className = "text-secondary font-bold";
+      shippingFeeEl.innerText = `₹${shippingFee.toFixed(2)}`;
     }
 
-    let grand = Math.max(0, subtotal - disc) + currentShipping;
+    let grand = Math.max(0, subtotal - disc) + shippingFee;
     document.getElementById("cart-grand-total").innerText = `₹${grand.toFixed(2)}`;
   };
   recalculateTotal();
@@ -1498,13 +1485,10 @@ function renderCheckoutPage(container) {
 
   // Dynamic Shipping Calculations
   const shippingFee = settings.shippingFee !== undefined ? settings.shippingFee : 40;
-  const freeShippingMin = settings.freeShippingMin !== undefined ? settings.freeShippingMin : 499;
-  const isFreeShipping = subtotal >= freeShippingMin;
-  const currentShipping = isFreeShipping ? 0 : shippingFee;
 
   let grandTotal = subtotal - discount;
   if (grandTotal < 0) grandTotal = 0;
-  grandTotal += currentShipping;
+  grandTotal += shippingFee;
 
   container.innerHTML = `
     <div class="container">
@@ -1633,7 +1617,7 @@ function renderCheckoutPage(container) {
           ` : ""}
           <div class="cart-summary-row">
             <span>Shipping:</span>
-            <span class="${isFreeShipping ? "text-success" : "text-secondary"} font-bold">${isFreeShipping ? "FREE Delivery" : `₹${shippingFee.toFixed(2)}`}</span>
+            <span class="text-secondary font-bold">₹${shippingFee.toFixed(2)}</span>
           </div>
           <div class="cart-summary-row" style="border-top:1px solid var(--border-color); padding-top:10px; margin-top:10px;">
             <span class="font-bold">Total to Pay:</span>
@@ -2035,7 +2019,7 @@ function renderFAQPage(container) {
         <div class="faq-item">
           <div class="faq-question">How long does shipping take and what are the charges? <i class="fa-solid fa-chevron-down"></i></div>
           <div class="faq-answer">
-            Standard shipping is ₹${settings.shippingFee.toFixed(2)} (completely FREE for orders above ₹${settings.freeShippingMin.toFixed(2)}). Orders are shipped within 24-48 hours. Delivery takes 3-5 business days depending on your locality.
+            We charge a standard flat shipping fee of ₹${settings.shippingFee.toFixed(2)} for orders across India. Orders are processed and shipped within 24-48 hours. Delivery takes 3-5 business days depending on your locality.
           </div>
         </div>
         <div class="faq-item">
@@ -2257,7 +2241,7 @@ function renderPolicyPage(container, title, key) {
   } else {
     policyText = `
       <h3 class="mb-3">India-wide Shipping & Rates</h3>
-      <p>We provide standard India-wide shipping for <strong class="text-accent">₹${settings.shippingFee.toFixed(2)}</strong>. You can unlock 100% FREE delivery shipping on all orders with a subtotal of <strong class="text-success">₹${settings.freeShippingMin.toFixed(2)}</strong> or more.</p>
+      <p>We charge a standard shipping rate of <strong class="text-accent">₹${settings.shippingFee.toFixed(2)}</strong> for all orders across India. There are no minimum order thresholds required, and shipping is calculated automatically at checkout.</p>
       <h3 class="mt-4 mb-3">Dispatch & Timelines</h3>
       <p>All sticker packs are packed securely in rigid cardboard envelopes to avoid bending during transit. Orders are dispatched within 24-48 business hours. Average delivery times: Metro cities (2-3 business days), rest of India (4-5 business days). You can track your order status in your User Dashboard.</p>
     `;
