@@ -22,11 +22,19 @@ try {
         
         # Resolve path
         $url = $request.Url.LocalPath
-        if ($url -eq "/") { $url = "/index.html" }
         
-        # Sanitize path to prevent directory traversal
-        $url = $url.Replace("..", "").Replace("\", "/")
-        $filePath = Join-Path (Get-Location) $url
+        # Route admin path to stickiverse-admin folder
+        $filePath = ""
+        if ($url -eq "/admin" -or $url -eq "/admin/") {
+            $filePath = Join-Path (Get-Location) "../stickiverse-admin/index.html"
+        } elseif ($url.StartsWith("/admin/")) {
+            $subUrl = $url.Substring(7) # Strip "/admin/"
+            $filePath = Join-Path (Get-Location) "../stickiverse-admin/$subUrl"
+        } else {
+            if ($url -eq "/") { $url = "/index.html" }
+            $url = $url.Replace("..", "").Replace("\", "/")
+            $filePath = Join-Path (Get-Location) $url
+        }
         
         # If directory, append index.html
         if (Test-Path $filePath -PathType Container) {
