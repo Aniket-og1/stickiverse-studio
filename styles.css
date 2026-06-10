@@ -64,6 +64,10 @@
   --card-gradient: linear-gradient(135deg, rgba(20, 23, 40, 0.7) 0%, rgba(13, 15, 26, 0.95) 100%);
   --holo-gradient: linear-gradient(135deg, rgba(34, 211, 238, 0.1) 0%, rgba(167, 139, 250, 0.1) 50%, rgba(244, 114, 182, 0.1) 100%);
   --gradient-rainbow: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-purple) 100%);
+  --blink-green: #0c831f;
+  --blink-green-hover: #0a6f1a;
+  --blink-yellow: #f5c423;
+  --blink-yellow-hover: #e0b21b;
 }
 
 /* Light Theme */
@@ -96,6 +100,10 @@
   --card-gradient: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(241, 245, 249, 0.95) 100%);
   --holo-gradient: linear-gradient(135deg, rgba(8, 145, 178, 0.06) 0%, rgba(124, 58, 237, 0.06) 50%, rgba(219, 39, 119, 0.06) 100%);
   --gradient-rainbow: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-purple) 100%);
+  --blink-green: #0c831f;
+  --blink-green-hover: #0a6f1a;
+  --blink-yellow: #f5c423;
+  --blink-yellow-hover: #e0b21b;
 }
 
 /* --- CSS Reset --- */
@@ -2433,3 +2441,293 @@ th {
     flex-direction: column;
   }
 }
+
+/* --- Blinkit Inspired Layout & UI Elements --- */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.blinkit-delivery-indicator {
+  border-left: 1px solid var(--border-color);
+  padding-left: var(--spacing-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  font-family: var(--font-body);
+  line-height: 1.25;
+}
+
+.blinkit-delivery-indicator .delivery-time {
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+
+.blinkit-delivery-indicator .delivery-address {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.blinkit-delivery-indicator .delivery-address i {
+  font-size: 0.65rem;
+  color: var(--blink-green);
+}
+
+/* Centered Desktop Search Bar */
+.header-search-bar {
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 var(--spacing-md);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.header-search-bar:focus-within {
+  border-color: var(--blink-green);
+  box-shadow: 0 0 0 2px rgba(12, 131, 31, 0.15);
+}
+
+.header-search-bar .search-icon {
+  color: var(--text-muted);
+  margin-right: 8px;
+  font-size: 0.9rem;
+}
+
+.header-search-bar input {
+  flex-grow: 1;
+  background: none;
+  border: none;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  outline: none;
+}
+
+.header-search-bar .search-btn {
+  background: var(--blink-green);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.header-search-bar .search-btn:hover {
+  background-color: var(--blink-green-hover);
+}
+
+/* Blinkit Style Cart Pill */
+.blinkit-cart-pill {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: var(--blink-green);
+  color: #fff;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: 0 4px 12px rgba(12, 131, 31, 0.2);
+}
+
+.blinkit-cart-pill:hover {
+  background-color: var(--blink-green-hover);
+  transform: translateY(-1px);
+}
+
+.cart-icon-wrapper {
+  position: relative;
+  font-size: 1.1rem;
+}
+
+.cart-count-badge {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  background-color: var(--blink-yellow);
+  color: #000;
+  font-size: 0.7rem;
+  font-weight: 800;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cart-text-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  font-size: 0.75rem;
+  line-height: 1.25;
+}
+
+.cart-title {
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.cart-total-price {
+  font-weight: 800;
+}
+
+/* Horizontal Category Slider */
+.category-slider-section {
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+}
+
+.category-slider {
+  display: flex;
+  overflow-x: auto;
+  gap: var(--spacing-md);
+  padding: 10px 0;
+  scrollbar-width: none;
+}
+
+.category-slider::-webkit-scrollbar {
+  display: none;
+}
+
+.category-slider-item {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.category-slider-img {
+  width: 76px;
+  height: 76px;
+  border-radius: var(--radius-full);
+  background: var(--bg-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid transparent;
+  overflow: hidden;
+  transition: all var(--transition-fast);
+}
+
+.category-slider-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.category-slider-item:hover .category-slider-img,
+.category-slider-item.active .category-slider-img {
+  border-color: var(--blink-green);
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(12, 131, 31, 0.15);
+}
+
+.category-slider-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+/* Blinkit Style Add Button */
+.blinkit-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-primary);
+  color: var(--blink-green);
+  border: 1.5px solid var(--blink-green);
+  border-radius: 6px;
+  padding: 6px 18px;
+  font-weight: 800;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  min-width: 80px;
+  height: 32px;
+  transition: all var(--transition-fast);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.light-theme .blinkit-add-btn {
+  background-color: #fff;
+}
+
+.blinkit-add-btn:hover {
+  background-color: var(--blink-green);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(12, 131, 31, 0.2);
+}
+
+/* Quantity Control Pill */
+.blinkit-qty-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--blink-green);
+  color: #fff;
+  border-radius: 6px;
+  padding: 2px;
+  min-width: 80px;
+  height: 32px;
+  box-shadow: 0 4px 8px rgba(12, 131, 31, 0.2);
+}
+
+.blinkit-qty-btn button {
+  background: none;
+  border: none;
+  color: #fff;
+  width: 26px;
+  height: 26px;
+  font-weight: 800;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+.blinkit-qty-btn button:hover {
+  opacity: 0.8;
+}
+
+.blinkit-qty-btn .qty-val {
+  font-weight: 800;
+  font-size: 0.85rem;
+}
+
+/* Hide desktop search and location indicators on mobile */
+@media (max-width: 768px) {
+  .header-search-bar {
+    display: none;
+  }
+  .blinkit-delivery-indicator {
+    display: none;
+  }
+  .desktop-nav {
+    display: none;
+  }
+}
+

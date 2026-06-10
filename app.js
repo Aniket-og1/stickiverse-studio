@@ -13,7 +13,7 @@ const DEFAULT_PRODUCTS = [
     salePrice: 299,
     stock: 50,
     image: "assets/holo_space.png",
-    tags: ["holographic", "space", "astronaut", "glow"],
+    tags: ["holographic", "space", "astronaut", "glow", "laptop"],
     rating: 4.8,
     reviewsCount: 14,
     featured: true,
@@ -28,7 +28,7 @@ const DEFAULT_PRODUCTS = [
     salePrice: 349,
     stock: 42,
     image: "assets/neon_cyber.png",
-    tags: ["cyberpunk", "neon", "kanji", "holographic"],
+    tags: ["cyberpunk", "neon", "kanji", "holographic", "mobile", "phone", "laptop"],
     rating: 4.9,
     reviewsCount: 22,
     featured: true,
@@ -43,7 +43,7 @@ const DEFAULT_PRODUCTS = [
     salePrice: 249,
     stock: 80,
     image: "assets/dripping_anime.png",
-    tags: ["anime", "dripping", "pop-art", "cute"],
+    tags: ["anime", "dripping", "pop-art", "cute", "laptop", "mobile", "phone"],
     rating: 4.7,
     reviewsCount: 19,
     featured: false,
@@ -58,7 +58,7 @@ const DEFAULT_PRODUCTS = [
     salePrice: 279,
     stock: 30,
     image: "assets/vaporwave.png",
-    tags: ["vaporwave", "retro", "aesthetic", "synthwave"],
+    tags: ["vaporwave", "retro", "aesthetic", "synthwave", "laptop", "mobile", "phone"],
     rating: 4.6,
     reviewsCount: 11,
     featured: true,
@@ -186,13 +186,19 @@ function showToast(message, type = "success") {
 // --- Cart and Wishlist Controls ---
 function updateBadges() {
   const cartBadge = document.getElementById("cart-badge");
+  const cartBadgeCount = document.getElementById("cart-badge-count");
+  const cartBadgeTotal = document.getElementById("cart-badge-total");
   const wishlistBadge = document.getElementById("wishlist-badge");
   const cartDrawerCount = document.getElementById("cart-drawer-count");
   
   const cartQtySum = cart.reduce((sum, item) => sum + item.qty, 0);
-  cartBadge.innerText = cartQtySum;
-  cartDrawerCount.innerText = cartQtySum;
-  wishlistBadge.innerText = wishlist.length;
+  const cartTotalSum = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+  
+  if (cartBadge) cartBadge.innerText = cartQtySum;
+  if (cartBadgeCount) cartBadgeCount.innerText = cartQtySum;
+  if (cartBadgeTotal) cartBadgeTotal.innerText = `₹${cartTotalSum.toFixed(2)}`;
+  if (cartDrawerCount) cartDrawerCount.innerText = cartQtySum;
+  if (wishlistBadge) wishlistBadge.innerText = wishlist.length;
 }
 
 function addToCart(productId, qty = 1, variant = "Standard") {
@@ -227,6 +233,16 @@ function addToCart(productId, qty = 1, variant = "Standard") {
   updateBadges();
   renderCartDrawer();
   showToast(`Added ${prod.title} (${variant}) to your Cart!`);
+  
+  // Silent UI refresh (Blinkit style)
+  const currentHash = window.location.hash || "#/";
+  if (currentHash === "#/cart") {
+    renderCartPage(document.getElementById("main-content"));
+  } else if (currentHash === "#/checkout") {
+    renderCheckoutPage(document.getElementById("main-content"));
+  } else {
+    router(false);
+  }
 }
 
 function toggleWishlist(productId) {
@@ -268,11 +284,13 @@ function updateCartQty(productId, variant, delta) {
   renderCartDrawer();
   
   // If we are currently on the full cart page, refresh its contents
-  if (window.location.hash === "#/cart") {
-    renderCartPage();
-  }
-  if (window.location.hash === "#/checkout") {
-    renderCheckoutPage();
+  const currentHash = window.location.hash || "#/";
+  if (currentHash === "#/cart") {
+    renderCartPage(document.getElementById("main-content"));
+  } else if (currentHash === "#/checkout") {
+    renderCheckoutPage(document.getElementById("main-content"));
+  } else {
+    router(false);
   }
 }
 
@@ -282,8 +300,13 @@ function removeFromCart(productId, variant) {
   updateBadges();
   renderCartDrawer();
   
-  if (window.location.hash === "#/cart") {
-    renderCartPage();
+  const currentHash = window.location.hash || "#/";
+  if (currentHash === "#/cart") {
+    renderCartPage(document.getElementById("main-content"));
+  } else if (currentHash === "#/checkout") {
+    renderCheckoutPage(document.getElementById("main-content"));
+  } else {
+    router(false);
   }
   showToast("Item removed from cart.");
 }
@@ -372,12 +395,6 @@ function renderCartDrawer() {
 
 // --- Layout Modals & Theme Triggers ---
 function initAppLayout() {
-  // Update Merchant Portal link dynamically from settings
-  const adminLink = document.getElementById("storefront-admin-link");
-  if (adminLink && settings.adminUrl) {
-    adminLink.href = settings.adminUrl;
-  }
-
   const themeToggle = document.getElementById("theme-toggle");
   const cartTrigger = document.getElementById("cart-trigger");
   const cartDrawer = document.getElementById("cart-drawer");
@@ -450,17 +467,21 @@ function initAppLayout() {
     link.addEventListener("click", closeMobileFn);
   });
 
-  // Search trigger toggling
-  searchTrigger.addEventListener("click", (e) => {
-    e.stopPropagation();
-    searchBox.classList.toggle("open");
-    if (searchBox.classList.contains("open")) {
-      searchInput.focus();
-    }
-  });
+  // Search trigger toggling (if search trigger is visible, otherwise permanent search is used)
+  if (searchTrigger) {
+    searchTrigger.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (searchBox) {
+        searchBox.classList.toggle("open");
+        if (searchBox.classList.contains("open")) {
+          searchInput.focus();
+        }
+      }
+    });
+  }
   
   document.addEventListener("click", (e) => {
-    if (!searchBox.contains(e.target) && e.target !== searchTrigger && !searchTrigger.contains(e.target)) {
+    if (searchBox && searchTrigger && !searchBox.contains(e.target) && e.target !== searchTrigger && !searchTrigger.contains(e.target)) {
       searchBox.classList.remove("open");
     }
   });
@@ -469,26 +490,15 @@ function initAppLayout() {
     const query = searchInput.value.trim();
     if (query) {
       window.location.hash = `#/shop?search=${encodeURIComponent(query)}`;
-      searchBox.classList.remove("open");
+      if (searchBox) searchBox.classList.remove("open");
       searchInput.value = "";
     }
   };
 
-  searchBtn.addEventListener("click", performSearch);
-  searchInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") performSearch();
-  });
-
-  // Newsletter signup form
-  const newsletterForm = document.getElementById("newsletter-form");
-  if (newsletterForm) {
-    newsletterForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const emailInput = document.getElementById("newsletter-email");
-      if (emailInput.value.trim()) {
-        showToast("Awesome! You are now subscribed to the Sticker Rebellion 🚀");
-        emailInput.value = "";
-      }
+  if (searchBtn) searchBtn.addEventListener("click", performSearch);
+  if (searchInput) {
+    searchInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") performSearch();
     });
   }
 
@@ -553,18 +563,24 @@ function initAppLayout() {
 }
 
 // --- Dynamic View Router ---
-function router() {
+function router(showLoader = true) {
   const content = document.getElementById("main-content");
   const path = window.location.hash || "#/";
   
   // Show Loader briefly for transition
   const loader = document.getElementById("page-loader");
-  loader.classList.remove("fade-out");
-  
-  // Page Transition duration mock
-  setTimeout(() => {
-    loader.classList.add("fade-out");
-  }, 300);
+  if (loader) {
+    if (showLoader) {
+      loader.classList.remove("fade-out");
+      
+      // Page Transition duration mock
+      setTimeout(() => {
+        loader.classList.add("fade-out");
+      }, 300);
+    } else {
+      loader.classList.add("fade-out");
+    }
+  }
 
   // Parse queries
   const parts = path.split("?");
@@ -663,7 +679,7 @@ function renderHome(container) {
               <a href="#/about" class="btn btn-secondary">Our Story</a>
             </div>
             <div class="hero-badge-strip">
-              <div class="hero-badge"><i class="fa-solid fa-truck-fast"></i> India-wide Free Delivery</div>
+              <div class="hero-badge"><i class="fa-solid fa-truck-fast"></i> India-wide Secure Shipping</div>
               <div class="hero-badge"><i class="fa-solid fa-shield-halved"></i> Secured UPI via FamPay</div>
               <div class="hero-badge"><i class="fa-solid fa-droplet"></i> Waterproof Vinyl</div>
             </div>
@@ -675,37 +691,40 @@ function renderHome(container) {
       </div>
     </section>
 
-    <!-- Categories Grid -->
-    <section class="section-padding">
+    <!-- Categories Slider Section (Blinkit Style) -->
+    <section class="category-slider-section">
       <div class="container">
-        <div class="section-header">
-          <h2 class="section-title">Explore Categories</h2>
-          <a href="#/shop" class="btn btn-outline-accent btn-sm">View Catalog</a>
-        </div>
-        <div class="category-grid">
-          <div class="category-card" style="background-image: url('assets/neon_cyber.png');">
-            <div class="category-card-info">
-              <span>Future Aesthetics</span>
-              <h3>Cyberpunk</h3>
+        <h3 class="mb-2" style="font-size: 1rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">Shop by Category</h3>
+        <div class="category-slider">
+          <div class="category-slider-item" data-category="">
+            <div class="category-slider-img">
+              <img src="assets/hero_banner.png" alt="All Pack">
             </div>
+            <span class="category-slider-title">All Stickers</span>
           </div>
-          <div class="category-card" style="background-image: url('assets/holo_space.png');">
-            <div class="category-card-info">
-              <span>Color-Shifting Foils</span>
-              <h3>Holographic</h3>
+          <div class="category-slider-item" data-category="Cyberpunk">
+            <div class="category-slider-img">
+              <img src="assets/neon_cyber.png" alt="Cyberpunk">
             </div>
+            <span class="category-slider-title">Cyberpunk</span>
           </div>
-          <div class="category-card" style="background-image: url('assets/dripping_anime.png');">
-            <div class="category-card-info">
-              <span>Bold Pastel Drips</span>
-              <h3>Anime & Pop</h3>
+          <div class="category-slider-item" data-category="Holographic">
+            <div class="category-slider-img">
+              <img src="assets/holo_space.png" alt="Holographic">
             </div>
+            <span class="category-slider-title">Holographic</span>
           </div>
-          <div class="category-card" style="background-image: url('assets/vaporwave.png');">
-            <div class="category-card-info">
-              <span>80s Nostalgia</span>
-              <h3>Vaporwave</h3>
+          <div class="category-slider-item" data-category="Pop-Art">
+            <div class="category-slider-img">
+              <img src="assets/dripping_anime.png" alt="Anime & Pop">
             </div>
+            <span class="category-slider-title">Anime & Pop</span>
+          </div>
+          <div class="category-slider-item" data-category="Vaporwave">
+            <div class="category-slider-img">
+              <img src="assets/vaporwave.png" alt="Vaporwave">
+            </div>
+            <span class="category-slider-title">Vaporwave</span>
           </div>
         </div>
       </div>
@@ -753,33 +772,16 @@ function renderHome(container) {
       </div>
     </section>
 
-    <!-- Customer Reviews System -->
-    <section class="section-padding" style="background-color: var(--bg-secondary); border-top: 1px solid var(--border-color);">
-      <div class="container">
-        <div class="text-center mb-5">
-          <h2>Loved by Creators & Devs</h2>
-          <p>Read review responses from real verified collectors in our community.</p>
-        </div>
-        <div class="blog-grid" style="grid-template-columns: repeat(3, 1fr);">
-          <div class="glass-card p-4">
-            <div class="review-stars mb-2" style="color: #fbbf24;"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
-            <p class="italic mb-3">"The holographic space pack is literally out of this world! Shines beautifully under desk lamps and holds up to scratches really well."</p>
-            <div class="font-bold">- Rohan M. <span class="text-success small-text"><i class="fa-solid fa-circle-check"></i> Verified Buyer</span></div>
-          </div>
-          <div class="glass-card p-4">
-            <div class="review-stars mb-2" style="color: #fbbf24;"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
-            <p class="italic mb-3">"I bombed my keyboard setup with the cyberpunk neon pack. They feel extremely premium, and the colors are super punchy."</p>
-            <div class="font-bold">- Ananya K. <span class="text-success small-text"><i class="fa-solid fa-circle-check"></i> Verified Buyer</span></div>
-          </div>
-          <div class="glass-card p-4">
-            <div class="review-stars mb-2" style="color: #fbbf24;"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
-            <p class="italic mb-3">"Simple, secure payment with my FamApp UPI. No cash on delivery needed when delivery is free and checkout takes 10 seconds!"</p>
-            <div class="font-bold">- Kabir S. <span class="text-success small-text"><i class="fa-solid fa-circle-check"></i> Verified Buyer</span></div>
-          </div>
-        </div>
-      </div>
-    </section>
+
   `;
+
+  // Attach category slider triggers
+  document.querySelectorAll(".category-slider-item").forEach(item => {
+    item.addEventListener("click", () => {
+      const cat = item.dataset.category;
+      window.location.hash = cat ? `#/shop?category=${cat}` : `#/shop`;
+    });
+  });
 
   // Attach card triggers
   bindProductCardEvents();
@@ -809,6 +811,26 @@ function renderShop(container, queryParams) {
       });
       if (p.category.toLowerCase().includes(q)) score += 2;
       if (p.description.toLowerCase().includes(q)) score += 1;
+
+      // Synonym expansion for mobile/laptop devices (Bug B Fix)
+      const mobileWords = ["mobile", "phone", "case", "fampay"];
+      const laptopWords = ["laptop", "computer", "keyboard", "notebook", "pc"];
+      
+      const isMobileSearch = mobileWords.some(w => q.includes(w));
+      const isLaptopSearch = laptopWords.some(w => q.includes(w));
+      
+      if (isMobileSearch) {
+        const pDesc = p.description.toLowerCase();
+        if (pDesc.includes("phone") || pDesc.includes("mobile") || pDesc.includes("case") || p.tags.some(t => t.includes("phone") || t.includes("mobile"))) {
+          score += 4;
+        }
+      }
+      if (isLaptopSearch) {
+        const pDesc = p.description.toLowerCase();
+        if (pDesc.includes("laptop") || pDesc.includes("keyboard") || pDesc.includes("computer") || p.tags.some(t => t.includes("laptop") || t.includes("keyboard"))) {
+          score += 4;
+        }
+      }
     } else {
       score = 1;
     }
@@ -900,7 +922,7 @@ function renderShop(container, queryParams) {
             </div>
           </div>
 
-          <div class="product-grid" style="grid-template-columns: repeat(3, 1fr);">
+          <div class="product-grid">
             ${catalogGridHtml}
           </div>
         </div>
@@ -947,6 +969,27 @@ function renderProductCardHtml(p) {
   const isWishlisted = wishlist.includes(p.id);
   const discountPercent = Math.round(((p.price - p.salePrice) / p.price) * 100);
   
+  // Blinkit Add Button Interaction
+  const cartItem = cart.find(item => item.id === p.id && item.variant === "Standard");
+  const qtyInCart = cartItem ? cartItem.qty : 0;
+  
+  let actionBtnHtml = "";
+  if (qtyInCart > 0) {
+    actionBtnHtml = `
+      <div class="blinkit-qty-btn">
+        <button class="qty-dec-btn" data-id="${p.id}" data-var="Standard" aria-label="Decrease quantity"><i class="fa-solid fa-minus"></i></button>
+        <span class="qty-val">${qtyInCart}</span>
+        <button class="qty-inc-btn" data-id="${p.id}" data-var="Standard" aria-label="Increase quantity"><i class="fa-solid fa-plus"></i></button>
+      </div>
+    `;
+  } else {
+    actionBtnHtml = `
+      <button class="blinkit-add-btn" data-id="${p.id}" data-var="Standard" aria-label="Add to Cart">
+        ADD
+      </button>
+    `;
+  }
+  
   return `
     <div class="product-card">
       <div class="product-card-badge">-${discountPercent}%</div>
@@ -959,18 +1002,13 @@ function renderProductCardHtml(p) {
       <div class="product-card-info">
         <span class="product-card-cat">${p.category}</span>
         <a href="#/product/${p.id}" class="product-card-title">${p.title}</a>
-        <div class="product-card-rating">
-          <i class="fa-solid fa-star"></i>
-          <span>${p.rating.toFixed(1)} (${p.reviewsCount})</span>
-        </div>
+
         <div class="product-card-footer">
           <div class="price-container">
             <span class="price-old">₹${p.price}</span>
             <span class="price-current">₹${p.salePrice}</span>
           </div>
-          <button class="add-cart-btn home-add-cart" data-id="${p.id}" aria-label="Add to Cart">
-            <i class="fa-solid fa-plus"></i>
-          </button>
+          ${actionBtnHtml}
         </div>
       </div>
     </div>
@@ -986,11 +1024,27 @@ function bindProductCardEvents() {
     });
   });
 
-  document.querySelectorAll(".home-add-cart").forEach(btn => {
+  document.querySelectorAll(".blinkit-add-btn").forEach(btn => {
     btn.addEventListener("click", (e) => {
       e.stopPropagation();
       e.preventDefault();
       addToCart(btn.dataset.id, 1, "Standard");
+    });
+  });
+
+  document.querySelectorAll(".qty-dec-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      updateCartQty(btn.dataset.id, "Standard", -1);
+    });
+  });
+
+  document.querySelectorAll(".qty-inc-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      updateCartQty(btn.dataset.id, "Standard", 1);
     });
   });
 }
@@ -1044,10 +1098,6 @@ function renderProductDetail(container, id) {
           <h2>${prod.title}</h2>
           
           <div class="product-meta-row">
-            <div class="review-stars" style="color: #fbbf24;">
-              <i class="fa-solid fa-star"></i>
-              <span>${prod.rating.toFixed(1)} (${prod.reviewsCount} reviews)</span>
-            </div>
             <span class="stock-status ${prod.stock > 0 ? "stock-in" : "stock-out"}">
               ${prod.stock > 0 ? `<i class="fa-solid fa-circle-check"></i> ${prod.stock} In Stock` : `<i class="fa-solid fa-circle-xmark"></i> Out of Stock`}
             </span>
@@ -1095,75 +1145,17 @@ function renderProductDetail(container, id) {
         </div>
       </div>
 
-      <!-- Reviews and Description tabs -->
+      <!-- Product Description Details -->
       <div class="product-info-tabs">
-        <div class="tab-nav">
-          <button class="tab-btn active" data-tab="tab-details">Description Details</button>
-          <button class="tab-btn" data-tab="tab-reviews">Customer Reviews (${prod.reviewsCount})</button>
-        </div>
-        
-        <div class="tab-content active" id="tab-details">
-          <div class="glass-card p-4">
-            <h3 class="mb-3">Specifications</h3>
-            <table class="mb-3">
-              <tr><th>Brand</th><td>STICKIVERSE STUDIO</td></tr>
-              <tr><th>Material</th><td>Premium Waterproof Vinyl (Holographic/Standard/Glow)</td></tr>
-              <tr><th>Finish</th><td>UV Gloss Laminate / Scratch Resistant</td></tr>
-              <tr><th>Adhesive</th><td>Bubble-Free, High Tack Removable (Leaves no residue)</td></tr>
-            </table>
-            <p>Our sticker packs represent standard-setting, studio-level creative printing. Each graphic is conceptualized by creative designers and color-profiled for vibrant contrast on black carbon setups. They are perfect for laptops, skates, cases, iPads, or street decor.</p>
-          </div>
-        </div>
-
-        <div class="tab-content" id="tab-reviews">
-          <div class="glass-card p-4">
-            <h3 class="mb-3">Reviews</h3>
-            <!-- Add review form -->
-            <form id="review-form" class="mb-4" style="border-bottom:1px solid var(--border-color); padding-bottom:20px;">
-              <h4 class="mb-3">Submit a Review</h4>
-              <div class="form-grid">
-                <div class="form-group">
-                  <label for="rev-name">Your Name</label>
-                  <input type="text" id="rev-name" required placeholder="Jane Doe">
-                </div>
-                <div class="form-group">
-                  <label for="rev-stars">Rating (1-5 Stars)</label>
-                  <select id="rev-stars">
-                    <option value="5">⭐⭐⭐⭐⭐ (5/5)</option>
-                    <option value="4">⭐⭐⭐⭐ (4/5)</option>
-                    <option value="3">⭐⭐⭐ (3/5)</option>
-                    <option value="2">⭐⭐ (2/5)</option>
-                    <option value="1">⭐ (1/5)</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-group form-group-full">
-                <label for="rev-comment">Review Description</label>
-                <textarea id="rev-comment" required rows="3" placeholder="Tell us how you love the holographic quality..."></textarea>
-              </div>
-              <button type="submit" class="btn btn-accent btn-sm mt-2">Submit Verified Review</button>
-            </form>
-
-            <div class="reviews-list" id="reviews-list">
-              <!-- Render dynamic + mock reviews -->
-              <div class="review-item">
-                <div class="review-item-header">
-                  <span class="review-author">Karan J.</span>
-                  <span class="review-stars">⭐⭐⭐⭐⭐</span>
-                </div>
-                <p class="text-secondary text-sm">"Absolutely stunning print quality. These chameleons glow insanely bright. Will purchase the cyberpunk set next."</p>
-              </div>
-              ${prodReviews.map(r => `
-                <div class="review-item">
-                  <div class="review-item-header">
-                    <span class="review-author">${r.name}</span>
-                    <span class="review-stars">${"⭐".repeat(r.stars)}</span>
-                  </div>
-                  <p class="text-secondary text-sm">"${r.comment}"</p>
-                </div>
-              `).join("")}
-            </div>
-          </div>
+        <div class="glass-card p-4">
+          <h3 class="mb-3">Specifications</h3>
+          <table class="mb-3">
+            <tr><th>Brand</th><td>STICKIVERSE STUDIO</td></tr>
+            <tr><th>Material</th><td>Premium Waterproof Vinyl (Holographic/Standard/Glow)</td></tr>
+            <tr><th>Finish</th><td>UV Gloss Laminate / Scratch Resistant</td></tr>
+            <tr><th>Adhesive</th><td>Bubble-Free, High Tack Removable (Leaves no residue)</td></tr>
+          </table>
+          <p>Our sticker packs represent standard-setting, studio-level creative printing. Each graphic is conceptualized by creative designers and color-profiled for vibrant contrast on black carbon setups. They are perfect for laptops, skates, cases, iPads, or street decor.</p>
         </div>
       </div>
 
@@ -1249,46 +1241,7 @@ function renderProductDetail(container, id) {
     updateWishBtnState();
   });
 
-  // Tab controls
-  document.querySelectorAll(".tab-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-      document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
-      
-      btn.classList.add("active");
-      document.getElementById(btn.dataset.tab).classList.add("active");
-    });
-  });
 
-  // Submit Review Form
-  document.getElementById("review-form").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const name = document.getElementById("rev-name").value.trim();
-    const stars = Number(document.getElementById("rev-stars").value);
-    const comment = document.getElementById("rev-comment").value.trim();
-
-    if (!reviews[prod.id]) reviews[prod.id] = [];
-    reviews[prod.id].push({ name, stars, comment });
-    DB.set("sv_reviews", reviews);
-
-    // Dynamic append to list
-    const list = document.getElementById("reviews-list");
-    const item = document.createElement("div");
-    item.className = "review-item";
-    item.innerHTML = `
-      <div class="review-item-header">
-        <span class="review-author">${name}</span>
-        <span class="review-stars">${"⭐".repeat(stars)}</span>
-      </div>
-      <p class="text-secondary text-sm">"${comment}"</p>
-    `;
-    list.prepend(item);
-
-    // Reset fields
-    document.getElementById("rev-name").value = "";
-    document.getElementById("rev-comment").value = "";
-    showToast("Thank you for your verified review response!");
-  });
 
   bindProductCardEvents();
 }
@@ -1374,7 +1327,7 @@ function renderCartPage(container) {
           </div>
           <div class="cart-summary-row">
             <span>Shipping:</span>
-            <span class="text-success font-bold" id="cart-shipping-fee">FREE Delivery</span>
+            <span class="text-secondary font-bold" id="cart-shipping-fee">₹40.00</span>
           </div>
           <div class="cart-summary-row" style="border-top:1px solid var(--border-color); padding-top:15px; margin-top:15px;">
             <span class="font-large font-bold">Grand Total:</span>
@@ -1646,7 +1599,14 @@ function renderCheckoutPage(container) {
           <i class="fa-solid fa-clock-rotate-left"></i> Expires in: <span id="gateway-timer">05:00</span>
         </div>
         
-        <p class="small-text text-muted mb-4">Merchant UPI ID: <strong id="gateway-upi-id"></strong></p>
+        <p class="small-text text-muted mb-3">Merchant UPI ID: <strong id="gateway-upi-id"></strong></p>
+        
+        <!-- Transaction Ref UTR input to prevent unpaid orders -->
+        <div class="form-group mb-3" style="text-align: left;">
+          <label for="gateway-utr" style="display: block; margin-bottom: 5px; font-size: 0.85rem; color: var(--text-secondary); font-weight:600;">Enter 12-digit UPI UTR / Transaction ID *</label>
+          <input type="text" id="gateway-utr" placeholder="e.g. 345678901234" maxlength="12" required style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-secondary); color: var(--text-primary);">
+          <span id="utr-error-msg" class="text-error small-text" style="display: none; margin-top: 4px; color: var(--accent-pink);">Please enter a valid 12-digit UPI UTR number.</span>
+        </div>
         
         <div class="d-flex gap-2">
           <button class="btn btn-secondary btn-sm w-100" id="gateway-cancel">Cancel Payment</button>
@@ -1711,9 +1671,13 @@ function openUPIGateway(amount, shipping) {
   const qrImg = document.getElementById("gateway-qr-img");
   const upiLabel = document.getElementById("gateway-upi-id");
   const timerLabel = document.getElementById("gateway-timer");
+  const utrInput = document.getElementById("gateway-utr");
+  const utrErrorMsg = document.getElementById("utr-error-msg");
   
   overlay.classList.add("active");
   upiLabel.innerText = settings.upiId;
+  if (utrInput) utrInput.value = "";
+  if (utrErrorMsg) utrErrorMsg.style.display = "none";
 
   // Generate REAL UPI URI scheme
   // e.g. upi://pay?pa=recipient@bank&pn=MerchantName&am=Amount&cu=INR
@@ -1752,15 +1716,22 @@ function openUPIGateway(amount, shipping) {
   };
 
   confirmBtn.onclick = () => {
+    const utrVal = utrInput ? utrInput.value.trim() : "";
+    if (!/^\d{12}$/.test(utrVal)) {
+      if (utrErrorMsg) utrErrorMsg.style.display = "block";
+      showToast("Please enter a valid 12-digit UPI UTR number.", "error");
+      return;
+    }
+    
     cleanup();
-    showToast("Verifying transaction with FamPay API...");
+    showToast("Verifying transaction UTR with FamPay API...");
     setTimeout(() => {
-      completeOrder("UPI (FamPay)", shipping, amount);
+      completeOrder("UPI (FamPay)", shipping, amount, utrVal);
     }, 1500);
   };
 }
 
-function completeOrder(payMethod, shipping, amount) {
+function completeOrder(payMethod, shipping, amount, utr = null) {
   // Create order
   const orderId = `STK-${Date.now().toString().slice(-6)}`;
   const newOrder = {
@@ -1770,7 +1741,8 @@ function completeOrder(payMethod, shipping, amount) {
     shippingDetails: shipping,
     items: [...cart],
     total: amount,
-    status: "Paid" // Direct paid status because Online Only checkout
+    status: "Paid", // Direct paid status because Online Only checkout
+    utr: utr
   };
 
   // Push order & cleanup cart
@@ -1875,15 +1847,30 @@ function renderDashboard(container, queryParams) {
 
   const userOrders = orders.filter(o => o.shippingDetails.email.toLowerCase() === currentUser.email.toLowerCase());
   
-  let ordersRows = userOrders.map(o => `
-    <tr>
-      <td class="font-bold text-accent">${o.id}</td>
-      <td>${o.date}</td>
-      <td>₹${o.total.toFixed(2)}</td>
-      <td>${o.paymentMethod}</td>
-      <td><span class="stock-status stock-in" style="background-color:rgba(16, 185, 129, 0.15); color:var(--accent-green);"><i class="fa-solid fa-box"></i> Packed & Paid</span></td>
-    </tr>
-  `).join("");
+  let ordersRows = userOrders.map(o => {
+    let statusBadge = "";
+    if (o.status === "Paid") {
+      statusBadge = `<span class="stock-status stock-in" style="background-color:rgba(16, 185, 129, 0.15); color:var(--accent-green);"><i class="fa-solid fa-box"></i> Packed & Paid</span>`;
+    } else if (o.status === "Shipped") {
+      statusBadge = `<span class="stock-status" style="background-color:rgba(34, 211, 238, 0.15); color:var(--accent-cyan);"><i class="fa-solid fa-truck"></i> Shipped</span>`;
+    } else if (o.status === "Delivered") {
+      statusBadge = `<span class="stock-status" style="background-color:rgba(16, 185, 129, 0.25); color:var(--accent-green);"><i class="fa-solid fa-circle-check"></i> Delivered</span>`;
+    } else if (o.status === "Cancelled") {
+      statusBadge = `<span class="stock-status stock-out" style="background-color:rgba(244, 114, 182, 0.15); color:var(--accent-pink);"><i class="fa-solid fa-ban"></i> Cancelled</span>`;
+    } else {
+      statusBadge = `<span class="stock-status text-secondary">${o.status}</span>`;
+    }
+    
+    return `
+      <tr>
+        <td class="font-bold text-accent">${o.id}</td>
+        <td>${o.date}</td>
+        <td>₹${o.total.toFixed(2)}</td>
+        <td>${o.paymentMethod} ${o.utr ? `<br><small class="text-muted" style="font-size:0.75rem;">UTR: ${o.utr}</small>` : ""}</td>
+        <td>${statusBadge}</td>
+      </tr>
+    `;
+  }).join("");
 
   if (userOrders.length === 0) {
     ordersRows = `<tr><td colspan="5" class="text-center text-muted">You haven't made any transactions yet.</td></tr>`;
@@ -2128,7 +2115,7 @@ function renderAboutPage(container) {
         <p class="text-secondary mb-4">Born from a group of digital creators, designers, and terminal developers, STICKIVERSE STUDIO is dedicated to creating premium sticker merchandise. We grew tired of boring, generic, paper sticker designs that leave massive sticky residues on high-end laptops. We resolved to make premium sticker packs designed to stand out.</p>
 
         <h3 class="mb-3">Uncompromising Premium Grade</h3>
-        <p class="text-secondary mb-4">Our products are engineered with heavy die-cut custom contours, color-shifting foils (holographic cosmos), and waterproof laminations. We manage payments completely online via secure UPI configurations linked with FamPay accounts to offer our community a flawless India-wide shopping experience with zero-charge delivery shipping.</p>
+        <p class="text-secondary mb-4">Our products are engineered with heavy die-cut custom contours, color-shifting foils (holographic cosmos), and waterproof laminations. We manage payments completely online via secure UPI configurations linked with FamPay accounts to offer our community a flawless India-wide shipping experience with secure delivery shipping.</p>
       </div>
     </div>
   `;

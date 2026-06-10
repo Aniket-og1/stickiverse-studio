@@ -6,7 +6,7 @@
   <title>STICKIVERSE STUDIO | Premium Holographic & Cyber Stickers</title>
   
   <!-- SEO Meta Tags -->
-  <meta name="description" content="Welcome to STICKIVERSE STUDIO. Explore our premium, futuristic, and custom holographic & neon cyberpunk sticker packs. Free shipping inside India and secure UPI/FamPay checkouts.">
+  <meta name="description" content="Welcome to STICKIVERSE STUDIO. Explore our premium, futuristic, and custom holographic & neon cyberpunk sticker packs. Secure UPI/FamPay checkouts and fast shipping across India.">
   <meta name="keywords" content="stickers, holographic stickers, cyberpunk merchandise, custom decals, stickiverse, fampay stickers, neon art">
   <meta name="author" content="STICKIVERSE STUDIO">
   <meta name="robots" content="index, follow">
@@ -90,17 +90,32 @@
     <!-- Sticky Navigation Header -->
     <header class="glass-header">
       <div class="header-inner">
-        <!-- Logo and Brand -->
-        <a href="#/" class="logo-link" id="nav-logo">
-          <div class="logo-wrapper">
-            <span class="logo-text">STICKI<span class="highlight">VERSE</span></span>
-            <div class="logo-drips">
-              <span class="drip drip-1"></span>
-              <span class="drip drip-2"></span>
-              <span class="drip drip-3"></span>
+        <div class="header-left">
+          <!-- Logo and Brand -->
+          <a href="#/" class="logo-link" id="nav-logo">
+            <div class="logo-wrapper">
+              <span class="logo-text">STICKI<span class="highlight">VERSE</span></span>
+              <div class="logo-drips">
+                <span class="drip drip-1"></span>
+                <span class="drip drip-2"></span>
+                <span class="drip drip-3"></span>
+              </div>
             </div>
+          </a>
+
+          <!-- Delivery Location Indicator (Blinkit Style) -->
+          <div class="blinkit-delivery-indicator">
+            <div class="delivery-time">Delivering in 3-5 Days</div>
+            <div class="delivery-address">All India Shipping <i class="fa-solid fa-chevron-down"></i></div>
           </div>
-        </a>
+        </div>
+
+        <!-- Centered Search Bar (Blinkit Style) -->
+        <div class="header-search-bar" id="header-search-container">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="text" id="search-input" placeholder="Search 'cyberpunk', 'holographic' or 'anime'...">
+          <button id="search-btn" class="search-btn"><i class="fa-solid fa-arrow-right"></i></button>
+        </div>
 
         <!-- Desktop Navigation -->
         <nav class="desktop-nav">
@@ -116,17 +131,6 @@
 
         <!-- Header Actions -->
         <div class="header-actions">
-          <!-- Search Bar Trigger -->
-          <div class="search-trigger-container">
-            <button class="action-btn" id="search-trigger" aria-label="Search products">
-              <i class="fa-solid fa-magnifying-glass"></i>
-            </button>
-            <div class="dropdown-search-box" id="dropdown-search">
-              <input type="text" id="search-input" placeholder="Search stickers...">
-              <button id="search-btn"><i class="fa-solid fa-arrow-right"></i></button>
-            </div>
-          </div>
-
           <!-- Theme Toggle -->
           <button class="action-btn" id="theme-toggle" aria-label="Toggle theme">
             <i class="fa-solid fa-moon moon-icon"></i>
@@ -139,10 +143,16 @@
             <span class="badge" id="wishlist-badge">0</span>
           </a>
 
-          <!-- Cart Trigger -->
-          <button class="action-btn position-relative" id="cart-trigger" aria-label="Shopping Cart">
-            <i class="fa-solid fa-cart-shopping"></i>
-            <span class="badge badge-accent" id="cart-badge">0</span>
+          <!-- Cart Trigger (Blinkit Pill Style) -->
+          <button class="blinkit-cart-pill" id="cart-trigger" aria-label="Shopping Cart">
+            <div class="cart-icon-wrapper">
+              <i class="fa-solid fa-cart-shopping"></i>
+              <span class="cart-count-badge" id="cart-badge-count">0</span>
+            </div>
+            <div class="cart-text-wrapper">
+              <span class="cart-title">My Cart</span>
+              <span class="cart-total-price" id="cart-badge-total">₹0.00</span>
+            </div>
           </button>
 
           <!-- User Trigger (Login / Dashboard) -->
@@ -199,7 +209,7 @@
         </div>
         <div class="cart-summary-row shipping-row">
           <span>Shipping:</span>
-          <span class="text-success font-bold" id="cart-drawer-shipping">FREE</span>
+          <span class="text-secondary font-bold" id="cart-drawer-shipping">₹40.00</span>
         </div>
         <div class="cart-actions">
           <a href="#/cart" class="btn btn-secondary w-100">View Cart</a>
@@ -214,21 +224,6 @@
       <!-- Injected by Router -->
     </main>
 
-    <!-- Newsletter & Trust Banner -->
-    <section class="newsletter-section">
-      <div class="container">
-        <div class="newsletter-grid">
-          <div class="newsletter-info">
-            <h2>Join the Sticker Rebellion</h2>
-            <p>Subscribe to get exclusive early drops, holographic sticker giveaways, and 15% off your first order.</p>
-          </div>
-          <form class="newsletter-form" id="newsletter-form">
-            <input type="email" placeholder="Enter your email address" required id="newsletter-email">
-            <button type="submit" class="btn btn-accent">Subscribe</button>
-          </form>
-        </div>
-      </div>
-    </section>
 
     <!-- Footer -->
     <footer class="main-footer">
@@ -289,9 +284,7 @@
       <div class="footer-bottom">
         <div class="footer-bottom-inner">
           <p class="copyright">&copy; 2026 STICKIVERSE STUDIO. All rights reserved.</p>
-          <div class="footer-meta-links">
-            <a href="admin/" id="storefront-admin-link" target="_blank" class="admin-link"><i class="fa-solid fa-user-gear"></i> Merchant Portal</a>
-          </div>
+
         </div>
       </div>
     </footer>
