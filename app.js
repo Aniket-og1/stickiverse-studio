@@ -132,6 +132,17 @@ products.forEach(p => {
     p.image = p.image.replace("../assets/", "assets/");
     productsMigrated = true;
   }
+  
+  // Migration to add mobile/laptop tags to existing localStorage items (Bug B Fix)
+  const defaultProd = DEFAULT_PRODUCTS.find(dp => dp.id === p.id);
+  if (defaultProd) {
+    defaultProd.tags.forEach(t => {
+      if (!p.tags.includes(t)) {
+        p.tags.push(t);
+        productsMigrated = true;
+      }
+    });
+  }
 });
 if (productsMigrated) {
   DB.set("sv_products", products);
