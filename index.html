@@ -34,7 +34,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- Core Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=1.1">
+  <link rel="stylesheet" href="styles.css?v=1.2">
 
   <!-- Schema Markup (JSON-LD) for Local Business/Store -->
   <script type="application/ld+json">
@@ -102,20 +102,14 @@
               </div>
             </div>
           </a>
-
-          <!-- Delivery Location Indicator (Blinkit Style) -->
-          <div class="blinkit-delivery-indicator">
-            <div class="delivery-time">Delivering in 3-5 Days</div>
-            <div class="delivery-address">All India Shipping <i class="fa-solid fa-chevron-down"></i></div>
-          </div>
         </div>
 
         <!-- Centered Search Bar (Blinkit Style) -->
-        <div class="header-search-bar" id="header-search-container">
+        <form class="header-search-bar" id="header-search-form" action="" onsubmit="return false;">
           <i class="fa-solid fa-magnifying-glass search-icon"></i>
           <input type="text" id="search-input" placeholder="Search 'cyberpunk', 'holographic' or 'anime'...">
-          <button id="search-btn" class="search-btn"><i class="fa-solid fa-arrow-right"></i></button>
-        </div>
+          <button type="submit" id="search-btn" class="search-btn"><i class="fa-solid fa-arrow-right"></i></button>
+        </form>
 
         <!-- Desktop Navigation -->
         <nav class="desktop-nav">
@@ -336,6 +330,6 @@
   </div>
 
   <!-- Core App Logic -->
-  <script src="app.js?v=1.1"></script>
+  <script src="app.js?v=1.2"></script>
 </body>
 </html>

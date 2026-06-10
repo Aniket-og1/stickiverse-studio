@@ -2718,16 +2718,44 @@ th {
   font-size: 0.85rem;
 }
 
-/* Hide desktop search and location indicators on mobile */
+/* Responsive search and location indicators on mobile */
 @media (max-width: 768px) {
+  .header-inner {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "left actions"
+      "search search";
+    gap: 12px;
+    padding: 12px var(--spacing-sm);
+  }
+  .header-left {
+    grid-area: left;
+    display: flex;
+    align-items: center;
+  }
+  .header-actions {
+    grid-area: actions;
+    justify-content: flex-end;
+  }
   .header-search-bar {
-    display: none;
+    grid-area: search;
+    display: flex !important;
+    margin: 0;
+    max-width: 100%;
   }
   .blinkit-delivery-indicator {
     display: none;
   }
   .desktop-nav {
     display: none;
+  }
+  .main-content {
+    margin-top: 130px; /* Shift content down for taller header on mobile */
+  }
+  .glass-header.scrolled .header-inner {
+    padding: 8px var(--spacing-sm);
+    gap: 8px;
   }
 }
 

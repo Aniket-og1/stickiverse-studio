@@ -506,11 +506,19 @@ function initAppLayout() {
     }
   };
 
-  if (searchBtn) searchBtn.addEventListener("click", performSearch);
-  if (searchInput) {
-    searchInput.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") performSearch();
+  const searchForm = document.getElementById("header-search-form");
+  if (searchForm) {
+    searchForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      performSearch();
     });
+  } else {
+    if (searchBtn) searchBtn.addEventListener("click", performSearch);
+    if (searchInput) {
+      searchInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") performSearch();
+      });
+    }
   }
 
   // Header shrink on scroll
@@ -816,32 +824,52 @@ function renderShop(container, queryParams) {
     let score = 0;
     if (searchFilter) {
       const q = searchFilter.toLowerCase();
-      if (p.title.toLowerCase().includes(q)) score += 5;
-      p.tags.forEach(t => {
-        if (t.toLowerCase().includes(q)) score += 3;
-      });
-      if (p.category.toLowerCase().includes(q)) score += 2;
-      if (p.description.toLowerCase().includes(q)) score += 1;
+      const queryWords = q.split(/\s+/).filter(Boolean);
+      
+      // Synonym mappings
+      const synonyms = {
+        "mobile": ["mobile", "phone", "case", "fampay", "iphone", "android"],
+        "phone": ["mobile", "phone", "case", "fampay", "iphone", "android"],
+        "case": ["mobile", "phone", "case", "fampay", "iphone", "android"],
+        "fampay": ["mobile", "phone", "case", "fampay", "iphone", "android"],
+        "laptop": ["laptop", "computer", "keyboard", "notebook", "pc", "macbook"],
+        "computer": ["laptop", "computer", "keyboard", "notebook", "pc", "macbook"],
+        "keyboard": ["laptop", "computer", "keyboard", "notebook", "pc", "macbook"],
+        "pc": ["laptop", "computer", "keyboard", "notebook", "pc", "macbook"]
+      };
 
-      // Synonym expansion for mobile/laptop devices (Bug B Fix)
-      const mobileWords = ["mobile", "phone", "case", "fampay"];
-      const laptopWords = ["laptop", "computer", "keyboard", "notebook", "pc"];
-      
-      const isMobileSearch = mobileWords.some(w => q.includes(w));
-      const isLaptopSearch = laptopWords.some(w => q.includes(w));
-      
-      if (isMobileSearch) {
-        const pDesc = p.description.toLowerCase();
-        if (pDesc.includes("phone") || pDesc.includes("mobile") || pDesc.includes("case") || p.tags.some(t => t.includes("phone") || t.includes("mobile"))) {
-          score += 4;
+      // Expand query words with synonyms
+      let searchTerms = [...queryWords];
+      queryWords.forEach(word => {
+        if (synonyms[word]) {
+          searchTerms.push(...synonyms[word]);
         }
-      }
-      if (isLaptopSearch) {
-        const pDesc = p.description.toLowerCase();
-        if (pDesc.includes("laptop") || pDesc.includes("keyboard") || pDesc.includes("computer") || p.tags.some(t => t.includes("laptop") || t.includes("keyboard"))) {
-          score += 4;
+      });
+      // Deduplicate
+      searchTerms = [...new Set(searchTerms)];
+
+      const titleLower = p.title.toLowerCase();
+      const descLower = p.description.toLowerCase();
+      const catLower = p.category.toLowerCase();
+      
+      // Calculate score for each term
+      searchTerms.forEach(term => {
+        if (titleLower.includes(term)) {
+          score += 5;
         }
-      }
+        p.tags.forEach(t => {
+          const tagLower = t.toLowerCase();
+          if (tagLower.includes(term) || term.includes(tagLower)) {
+            score += 3;
+          }
+        });
+        if (catLower.includes(term)) {
+          score += 2;
+        }
+        if (descLower.includes(term)) {
+          score += 1;
+        }
+      });
     } else {
       score = 1;
     }
@@ -887,9 +915,9 @@ function renderShop(container, queryParams) {
         <aside class="catalog-filters glass-card">
           <div class="filter-group">
             <h3 class="filter-title">Search</h3>
-            <div style="position:relative;">
+            <form id="sidebar-search-form" action="" onsubmit="return false;" style="position:relative;">
               <input type="text" id="sidebar-search" value="${searchFilter}" placeholder="Keywords..." style="width: 100%; border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 4px;">
-            </div>
+            </form>
           </div>
           
           <div class="filter-group">
@@ -951,9 +979,17 @@ function renderShop(container, queryParams) {
     window.location.hash = `#/shop?search=${encodeURIComponent(searchVal)}&category=${encodeURIComponent(catVal)}&price=${priceVal}&sort=${sortVal}`;
   };
 
-  document.getElementById("sidebar-search").addEventListener("keypress", (e) => {
-    if (e.key === "Enter") applyFilters();
-  });
+  const sidebarSearchForm = document.getElementById("sidebar-search-form");
+  if (sidebarSearchForm) {
+    sidebarSearchForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      applyFilters();
+    });
+  } else {
+    document.getElementById("sidebar-search").addEventListener("keypress", (e) => {
+      if (e.key === "Enter") applyFilters();
+    });
+  }
   document.querySelectorAll('input[name="cat-radio"]').forEach(radio => {
     radio.addEventListener("change", applyFilters);
   });
