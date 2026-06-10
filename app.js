@@ -1788,7 +1788,7 @@ function completeOrder(payMethod, shipping, amount, utr = null) {
     shippingDetails: shipping,
     items: [...cart],
     total: amount,
-    status: "Paid", // Direct paid status because Online Only checkout
+    status: "Pending Verification", // Verification pending because UTR is verified manually by admin
     utr: utr
   };
 
@@ -1807,7 +1807,7 @@ function completeOrder(payMethod, shipping, amount, utr = null) {
 
 // 6. ORDER SUCCESS PAGE
 function renderOrderSuccessPage(container, orderId) {
-  document.title = "Payment Successful | STICKIVERSE STUDIO";
+  document.title = "Order Placed | STICKIVERSE STUDIO";
   const order = orders.find(o => o.id === orderId);
   
   if (!order) {
@@ -1833,20 +1833,30 @@ function renderOrderSuccessPage(container, orderId) {
   const waMessage = `Hello STICKIVERSE STUDIO! 🚀\n\nI just placed an order on your website. Here are my details:\n\n*Order ID:* ${order.id}\n*Date:* ${order.date}\n*Total Paid:* ₹${order.total.toFixed(2)} (${order.paymentMethod})\n\n*Ordered Items:*\n${itemsText}\n\n*Shipping Address:*\n${order.shippingDetails.name}\n${order.shippingDetails.address}, ${order.shippingDetails.city} - ${order.shippingDetails.zip}\nPhone: ${order.shippingDetails.phone}`;
   const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMessage)}`;
 
+  let statusBadge = "";
+  let statusDesc = "";
+  if (order.status === "Pending Verification") {
+    statusBadge = `<span class="badge-item status-pending" style="display:inline-flex; background-color:rgba(251,146,60,0.15); color:var(--accent-orange);"><i class="fa-solid fa-clock"></i> Verification Pending</span>`;
+    statusDesc = `Thank you for supporting STICKIVERSE STUDIO. Your payment reference details have been submitted. Our team is manually verifying the UPI transaction reference (UTR) you provided. Your order will be processed once payment is confirmed.`;
+  } else {
+    statusBadge = `<span class="badge-item bg-success text-success" style="display:inline-flex;"><i class="fa-solid fa-circle-check"></i> Verified Paid</span>`;
+    statusDesc = `Thank you for supporting STICKIVERSE STUDIO. Your payment was successfully received and verified.`;
+  }
+
   container.innerHTML = `
     <div class="container">
       <div class="status-box">
-        <div class="status-icon status-success-icon">
-          <i class="fa-solid fa-circle-check"></i>
+        <div class="status-icon status-success-icon" style="color: ${order.status === "Pending Verification" ? "var(--accent-orange)" : "var(--accent-green)"}; border-color: ${order.status === "Pending Verification" ? "var(--accent-orange)" : "var(--accent-green)"};">
+          <i class="${order.status === "Pending Verification" ? "fa-solid fa-clock" : "fa-solid fa-circle-check"}"></i>
         </div>
-        <h1 class="highlight">Order Placed Successfully!</h1>
-        <p class="text-secondary mt-2">Thank you for supporting STICKIVERSE STUDIO. Your payment was verified instantly.</p>
+        <h1 class="highlight">${order.status === "Pending Verification" ? "Order Placed!" : "Order Paid!"}</h1>
+        <p class="text-secondary mt-2">${statusDesc}</p>
         
         <div class="glass-card order-details-card">
           <h3 class="mb-3 text-center">Order Confirmation Details</h3>
           <div class="order-meta-grid">
             <div><strong>Order Reference ID:</strong> <span class="text-accent font-bold">${order.id}</span></div>
-            <div><strong>Transaction Status:</strong> <span class="badge-item bg-success text-success" style="display:inline-flex;"><i class="fa-solid fa-circle-check"></i> Verified Paid</span></div>
+            <div><strong>Transaction Status:</strong> ${statusBadge}</div>
             <div><strong>Total Paid:</strong> ₹${order.total.toFixed(2)}</div>
             <div><strong>Payment Mode:</strong> ${order.paymentMethod}</div>
           </div>
@@ -1896,7 +1906,9 @@ function renderDashboard(container, queryParams) {
   
   let ordersRows = userOrders.map(o => {
     let statusBadge = "";
-    if (o.status === "Paid") {
+    if (o.status === "Pending Verification") {
+      statusBadge = `<span class="stock-status status-pending" style="background-color:rgba(251, 146, 60, 0.15); color:var(--accent-orange);"><i class="fa-solid fa-clock"></i> Verification Pending</span>`;
+    } else if (o.status === "Paid") {
       statusBadge = `<span class="stock-status stock-in" style="background-color:rgba(16, 185, 129, 0.15); color:var(--accent-green);"><i class="fa-solid fa-box"></i> Packed & Paid</span>`;
     } else if (o.status === "Shipped") {
       statusBadge = `<span class="stock-status" style="background-color:rgba(34, 211, 238, 0.15); color:var(--accent-cyan);"><i class="fa-solid fa-truck"></i> Shipped</span>`;
@@ -1919,8 +1931,58 @@ function renderDashboard(container, queryParams) {
     `;
   }).join("");
 
+  let ordersMobileCards = userOrders.map(o => {
+    let statusBadge = "";
+    if (o.status === "Pending Verification") {
+      statusBadge = `<span class="stock-status status-pending" style="background-color:rgba(251, 146, 60, 0.15); color:var(--accent-orange);"><i class="fa-solid fa-clock"></i> Verification Pending</span>`;
+    } else if (o.status === "Paid") {
+      statusBadge = `<span class="stock-status stock-in" style="background-color:rgba(16, 185, 129, 0.15); color:var(--accent-green);"><i class="fa-solid fa-box"></i> Packed & Paid</span>`;
+    } else if (o.status === "Shipped") {
+      statusBadge = `<span class="stock-status" style="background-color:rgba(34, 211, 238, 0.15); color:var(--accent-cyan);"><i class="fa-solid fa-truck"></i> Shipped</span>`;
+    } else if (o.status === "Delivered") {
+      statusBadge = `<span class="stock-status" style="background-color:rgba(16, 185, 129, 0.25); color:var(--accent-green);"><i class="fa-solid fa-circle-check"></i> Delivered</span>`;
+    } else if (o.status === "Cancelled") {
+      statusBadge = `<span class="stock-status stock-out" style="background-color:rgba(244, 114, 182, 0.15); color:var(--accent-pink);"><i class="fa-solid fa-ban"></i> Cancelled</span>`;
+    } else {
+      statusBadge = `<span class="stock-status text-secondary">${o.status}</span>`;
+    }
+
+    // List out items inside card
+    const itemsList = o.items.map(item => `
+      <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-secondary); margin-bottom:4px;">
+        <span>${item.title} (x${item.qty})</span>
+        <span>₹${(item.price * item.qty).toFixed(2)}</span>
+      </div>
+    `).join("");
+
+    return `
+      <div class="mobile-order-card glass-card p-3 mb-3" style="border:1px solid var(--border-color); border-radius:8px; background:var(--bg-secondary);">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:8px; margin-bottom:8px;">
+          <div>
+            <strong class="text-accent">${o.id}</strong>
+            <div style="font-size:0.75rem; color:var(--text-secondary);">${o.date}</div>
+          </div>
+          <div>${statusBadge}</div>
+        </div>
+        <div style="margin-bottom:10px;">
+          ${itemsList}
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed var(--border-color); padding-top:8px; font-size:0.85rem;">
+          <div>
+            <span style="color:var(--text-secondary);">Mode:</span> <strong>${o.paymentMethod}</strong>
+            ${o.utr ? `<br><small class="text-muted" style="font-size:0.75rem;">UTR: ${o.utr}</small>` : ""}
+          </div>
+          <div>
+            <span style="color:var(--text-secondary);">Total:</span> <strong style="font-size:1.05rem; color:var(--text-primary);">₹${o.total.toFixed(2)}</strong>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
+
   if (userOrders.length === 0) {
     ordersRows = `<tr><td colspan="5" class="text-center text-muted">You haven't made any transactions yet.</td></tr>`;
+    ordersMobileCards = `<div class="text-center text-muted py-3">You haven't made any transactions yet.</div>`;
   }
 
   container.innerHTML = `
@@ -1934,14 +1996,16 @@ function renderDashboard(container, queryParams) {
           <div class="dashboard-menu-item" data-panel="panel-profile"><i class="fa-solid fa-address-card"></i> Profile Details</div>
           <div class="dashboard-menu-item" id="dashboard-logout" style="color:var(--accent-pink);"><i class="fa-solid fa-right-from-bracket"></i> Logout</div>
         </aside>
-
+ 
         <!-- Content Panels -->
         <div class="dashboard-content-area">
           
           <!-- Orders Panel -->
           <div class="dashboard-panel active glass-card p-4" id="panel-orders">
             <h3 class="mb-3">Purchased Order History</h3>
-            <div class="table-responsive">
+            
+            <!-- Desktop view table -->
+            <div class="table-responsive desktop-orders-view">
               <table>
                 <thead>
                   <tr>
@@ -1956,6 +2020,11 @@ function renderDashboard(container, queryParams) {
                   ${ordersRows}
                 </tbody>
               </table>
+            </div>
+
+            <!-- Mobile view cards -->
+            <div class="mobile-orders-view">
+              ${ordersMobileCards}
             </div>
           </div>
 
